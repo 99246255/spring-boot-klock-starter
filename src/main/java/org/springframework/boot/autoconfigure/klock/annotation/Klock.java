@@ -24,10 +24,10 @@ public @interface Klock {
      */
     String name() default "";
     /**
-     * 锁类型，默认可重入锁
+     * 锁类型，默认带看门狗可重入锁，锁释放时间、释放策略无效,默认锁过期时间未系统配置的watchdog（30秒）时间
      * @return lockType
      */
-    LockType lockType() default LockType.Reentrant;
+    LockType lockType() default LockType.ReentrantWatchDog;
     /**
      * 尝试加锁，最多等待时间
      * @return waitTime
@@ -49,10 +49,10 @@ public @interface Klock {
      * 加锁超时的处理策略
      * @return lockTimeoutStrategy
      */
-     LockTimeoutStrategy lockTimeoutStrategy() default LockTimeoutStrategy.NO_OPERATION;
+     LockTimeoutStrategy lockTimeoutStrategy() default LockTimeoutStrategy.FAIL_FAST;
 
     /**
-     * 自定义加锁超时的处理策略
+     * 自定义加锁超时的处理策略, 不为空则先执行自定义策略，为空执行加锁超时的处理策略
      * @return customLockTimeoutStrategy
      */
      String customLockTimeoutStrategy() default "";

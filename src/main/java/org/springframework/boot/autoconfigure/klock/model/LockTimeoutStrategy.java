@@ -30,41 +30,44 @@ public enum LockTimeoutStrategy implements LockTimeoutHandler {
     FAIL_FAST() {
         @Override
         public void handle(LockInfo lockInfo, Lock lock, JoinPoint joinPoint) {
-
-            String errorMsg = String.format("Failed to acquire Lock(%s) with timeout(%ds)", lockInfo.getName(), lockInfo.getWaitTime());
+            String errorMsg = String.format("获取锁(%s)超时(%ds)", lockInfo.getName(), lockInfo.getWaitTime());
             throw new KlockTimeoutException(errorMsg);
         }
     },
 
     /**
-     * 一直阻塞，直到获得锁，在太多的尝试后，仍会报错
+     * 一直阻塞，直到获得锁，100次，500秒左右在太多的尝试后，仍会报错
      */
     KEEP_ACQUIRE() {
 
         private static final long DEFAULT_INTERVAL = 100L;
 
-        private static final long DEFAULT_MAX_INTERVAL = 3 * 60 * 1000L;
+        /**
+         * 重试100次，从100毫秒，每次增加100毫秒，100次后是500秒左右
+         */
+        private static final int MAX_RETRY_COUNT = 100;
 
         @Override
         public void handle(LockInfo lockInfo, Lock lock, JoinPoint joinPoint) {
 
             long interval = DEFAULT_INTERVAL;
 
+            int count = 0;
             while(!lock.acquire()) {
-
-                if(interval > DEFAULT_MAX_INTERVAL) {
-                    String errorMsg = String.format("Failed to acquire Lock(%s) after too many times, this may because dead lock occurs.",
-                                                     lockInfo.getName());
+                if(count > 100) {
+                    String errorMsg = String.format("获取锁(%s)重复次数过多，可能死锁", lockInfo.getName());
                     throw new KlockTimeoutException(errorMsg);
                 }
-
                 try {
                     TimeUnit.MILLISECONDS.sleep(interval);
-                    interval <<= 1;
+                    interval += DEFAULT_INTERVAL;
+                    count++;
                 } catch (InterruptedException e) {
-                    throw new KlockTimeoutException("Failed to acquire Lock", e);
+                    throw new KlockTimeoutException(String.format("获取锁(%s)被中断失败", lockInfo.getName()), e);
                 }
             }
         }
     }
+
+
 }

@@ -12,10 +12,15 @@
 <dependency>
     <groupId>cn.keking</groupId>
     <artifactId>spring-boot-klock-starter</artifactId>
-    <version>1.4-RELEASE</version>
+    <version>2.0.0-SNAPSHOT</version>
 </dependency>
 
 ```
+##修改说明
+**1.升级redisson版本，springboot版本，添加看门狗修改默认使用redisson的可重入锁，并支持看门狗自动续期**
+**2.调整重试策略实现LockTimeoutStrategy.KEEP_ACQUIRE**
+**3.调整默认配置参数，添加看门狗的检查锁的超时时间配置**
+
 
 2.application.properties配置redis链接：spring.klock.address=127.0.0.1:6379
 
@@ -56,8 +61,9 @@ public class TestService {
 spring.klock.address  : redis链接地址
 spring.klock.password : redis密码
 spring.klock.database : redis数据索引
-spring.klock.waitTime : 获取锁最长阻塞时间（默认：60，单位：秒）
-spring.klock.leaseTime: 已获取锁后自动释放时间（默认：60，单位：秒）
+spring.klock.waitTime : 获取锁最长阻塞时间（默认：30，单位：秒）
+spring.klock.leaseTime: 已获取锁后自动释放时间（默认：30，单位：秒）
+spring.klock.watchdog: 看门狗检查锁的超时时间，对应lockWatchdogTimeout（默认：30，单位：）
 spring.klock.cluster-server.node-addresses : redis集群配置 如 127.0.0.1:7000,127.0.0.1:7001，127.0.0.1:7002
 spring.klock.address 和 spring.klock.cluster-server.node-addresses 选其一即可
 ```

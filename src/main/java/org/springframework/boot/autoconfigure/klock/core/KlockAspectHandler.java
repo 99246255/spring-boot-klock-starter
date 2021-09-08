@@ -52,15 +52,10 @@ public class KlockAspectHandler {
         currentThreadLock.put(curentLock,new LockRes(lockInfo, false));
         Lock lock = lockFactory.getLock(lockInfo);
         boolean lockRes = lock.acquire();
-
         //如果获取锁失败了，则进入失败的处理逻辑
         if(!lockRes) {
-            if(logger.isWarnEnabled()) {
-                logger.warn("Timeout while acquiring Lock({})", lockInfo.getName());
-            }
             //如果自定义了获取锁失败的处理策略，则执行自定义的降级处理策略
             if(!StringUtils.isEmpty(klock.customLockTimeoutStrategy())) {
-
                 return handleCustomLockTimeout(klock.customLockTimeoutStrategy(), joinPoint);
 
             } else {
@@ -69,10 +64,8 @@ public class KlockAspectHandler {
                 klock.lockTimeoutStrategy().handle(lockInfo, lock, joinPoint);
             }
         }
-
         currentThreadLock.get(curentLock).setLock(lock);
         currentThreadLock.get(curentLock).setRes(true);
-
         return joinPoint.proceed();
     }
 

@@ -5,6 +5,11 @@ package org.springframework.boot.autoconfigure.klock.model;
  * Content :锁类型
  */
 public enum LockType {
+
+    /**
+     * 可重入锁，带看门狗，此模式锁释放无效
+     */
+    ReentrantWatchDog,
     /**
      * 可重入锁
      */

@@ -45,13 +45,14 @@ public class KlockAutoConfiguration {
             config.useClusterServers().setPassword(klockConfig.getPassword())
                     .addNodeAddress(klockConfig.getClusterServer().getNodeAddresses());
         }else {
-            config.useSingleServer().setAddress(klockConfig.getAddress())
+            config.useSingleServer().setAddress("redis://" +klockConfig.getAddress())
                     .setDatabase(klockConfig.getDatabase())
                     .setPassword(klockConfig.getPassword());
         }
         Codec codec=(Codec) ClassUtils.forName(klockConfig.getCodec(),ClassUtils.getDefaultClassLoader()).newInstance();
         config.setCodec(codec);
         config.setEventLoopGroup(new NioEventLoopGroup());
+        config.setLockWatchdogTimeout(klockConfig.getWatchdog() * 1000L);
         return Redisson.create(config);
     }
 

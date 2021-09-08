@@ -16,8 +16,12 @@ public class KlockConfig {
     private ClusterServer clusterServer;
     private String codec = "org.redisson.codec.JsonJacksonCodec";
     //lock
-    private long waitTime = 60;
-    private long leaseTime = 60;
+    private long waitTime = 30;
+    private long leaseTime = 30;
+    /**
+     * 看门狗检查锁的超时时间（秒）
+     */
+    private long watchdog = 15;
 
     public String getAddress() {
         return address;
@@ -65,6 +69,14 @@ public class KlockConfig {
 
     public void setDatabase(int database) {
         this.database = database;
+    }
+
+    public long getWatchdog() {
+        return watchdog;
+    }
+
+    public void setWatchdog(long watchdog) {
+        this.watchdog = watchdog;
     }
 
     public ClusterServer getClusterServer() {

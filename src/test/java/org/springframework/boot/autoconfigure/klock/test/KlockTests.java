@@ -1,9 +1,10 @@
 package org.springframework.boot.autoconfigure.klock.test;
 
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.klock.handler.KlockTimeoutException;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,12 +40,15 @@ public class KlockTests {
 		IntStream.range(0,10).forEach(i-> executorService.submit(() -> {
 			try {
 				String result = testService.getValue("sleep");
-				System.err.println("线程:[" + Thread.currentThread().getName() + "]拿到结果=》" + result + new Date().toLocaleString());
+				System.err.println(i + "线程:[" + Thread.currentThread().getName() + "]拿到结果=》" + result + new Date().toLocaleString());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}));
-		executorService.awaitTermination(30, TimeUnit.SECONDS);
+		executorService.shutdown();
+		while (!executorService.isTerminated()) {
+			// pass
+		}
 	}
 
 

@@ -18,6 +18,8 @@ public class LockFactory  {
 
     public Lock getLock(LockInfo lockInfo){
         switch (lockInfo.getType()) {
+            case ReentrantWatchDog:
+                return new ReentrantWatchDogLock(redissonClient, lockInfo);
             case Reentrant:
                 return new ReentrantLock(redissonClient, lockInfo);
             case Fair:
